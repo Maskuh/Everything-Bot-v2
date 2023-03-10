@@ -1,0 +1,5 @@
+discord.py
+asyncio
+datetime
+python_dotenv
+motor
