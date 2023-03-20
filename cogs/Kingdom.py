@@ -13,7 +13,7 @@ class Kingdom(commands.Cog):
         self.channel = self.client.get_channel(os.getenv("Kingdom_rr2"))
     async def cog_load(self):
         self.vc.cancel()
-        #self.vc.start()
+        self.vc.start()
 
     
 

@@ -11,8 +11,8 @@ from dotenv import load_dotenv
 #________________________________________________
 #File Configs
 load_dotenv()
-#TOKEN = os.getenv('DISCORD_TOKEN')
-TOKEN = os.getenv('Testing_bot')
+TOKEN = os.getenv('DISCORD_TOKEN')
+#TOKEN = os.getenv('Testing_bot')
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
