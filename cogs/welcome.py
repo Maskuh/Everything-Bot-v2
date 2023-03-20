@@ -5,6 +5,7 @@ import datetime
 import asyncio
 import pymongo
 from discord.ext import commands
+from dotenv import load_dotenv
 from discord import Webhook, app_commands
 from pymongo import MongoClient
 import aiohttp
@@ -15,6 +16,7 @@ collection = db["welcomer"]
 class Welcome(commands.GroupCog):
     def __init__(self, client):
         self.client = client
+        load_dotenv()
     
 #welcome commands
 

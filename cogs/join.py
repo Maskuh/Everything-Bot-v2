@@ -6,9 +6,11 @@ import asyncio
 import pymongo
 from discord.ext import commands
 from discord import Webhook
+from dotenv import load_dotenv
 class join(commands.Cog):
     def __init__(self, client):
         self.client = client
+        load_dotenv()
 
     @commands.Cog.listener()
     async def on_member_join(self, member : discord.member):

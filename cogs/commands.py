@@ -5,12 +5,14 @@ import datetime
 import asyncio
 from discord.ext import commands, tasks
 from discord import app_commands
+from dotenv import load_dotenv
 
 
 class commands(commands.GroupCog):
 
     def __init__(self, client):
         self.client = client
+        load_dotenv()
 
 # Ping command
     @app_commands.command(description="check the ping of the bot!")

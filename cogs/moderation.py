@@ -5,11 +5,13 @@ import datetime
 import asyncio
 from discord import app_commands
 from discord.ext import commands
+from dotenv import load_dotenv
 
 class Moderation(commands.GroupCog):
 
     def __init__(self, client):
         self.client = client
+        load_dotenv()
 
     @app_commands.command(description='purge Amount of messages')
     @app_commands.checks.has_permissions(manage_messages=True)

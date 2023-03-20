@@ -6,6 +6,7 @@ import asyncio
 import pymongo
 from discord.ext import commands
 from discord import Webhook, app_commands
+from dotenv import load_dotenv
 from pymongo import MongoClient
 import aiohttp
 cluster = MongoClient(os.getenv("Mongo"))
@@ -14,6 +15,7 @@ collection = db["Leaver"]
 class leave(commands.GroupCog):
     def __init__(self, client):
         self.client = client
+        load_dotenv()
     
 #leave commands
 

@@ -63,7 +63,7 @@ async def on_ready():
   await bot.load_extension("cogs.Kingdom")
   await bot.load_extension("cogs.moderation")
   await bot.tree.sync()
-  await bot.change_presence(status= discord.Status.online, activity=discord.Game(f'%help Learning how to add more commands to my library of commands!'))
+  await bot.change_presence(status= discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name='How to add more commands to my library of commands!'))
   for guild in bot.guilds:
     print(guild.name)
     print(guild.me.guild_permissions)

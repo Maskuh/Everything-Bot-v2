@@ -6,9 +6,11 @@ import asyncio
 import pymongo
 from discord.ext import commands, tasks
 from discord import Webhook
+from dotenv import load_dotenv
 class Kingdom(commands.Cog):
     def __init__(self, client):
         self.client = client
+        load_dotenv()
         self.reaction_roles = os.getenv("Kingdom_rr")
         self.channel = self.client.get_channel(os.getenv("Kingdom_rr2"))
     async def cog_load(self):

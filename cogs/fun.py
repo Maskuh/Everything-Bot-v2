@@ -7,10 +7,12 @@ import random
 import json
 from discord import app_commands
 from discord.ext import commands
+from dotenv import load_dotenv
 class fun(commands.GroupCog):
 
     def __init__(self,client):
         self.client = client
+        load_dotenv()
 
     @app_commands.command(description= "Beg people to give you coins")
     @app_commands.checks.cooldown(1,45)
@@ -23,7 +25,7 @@ class fun(commands.GroupCog):
         em2 = (f"A person that walked up to your front door gave you a package with {earnings} coins in it. Wow what a treat!!")
         em3 = (f'You have bad luck you got nothing.')
         begthem = [em1, em2, em3]
-        await interaction.response.send_messsage(random.choice(begthem))
+        await interaction.response.send_message(random.choice(begthem))
         users = await self.get_bank_data()
         users[str(user.id)]["wallet"] += earnings
         with open("mainbank.json","w") as f:
@@ -67,7 +69,7 @@ class fun(commands.GroupCog):
     async def number(self, interaction: discord.Interaction):
         Number = random.randint(50, 150)
         await interaction.response.send_message(Number)
-    @app_commands.command()
+    @app_commands.command(description="Check how much you have in your wallet and bank")
     async def bal(self, interaction: discord.Interaction):
         await self.open_account(interaction.user)
         user = interaction.user
