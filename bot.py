@@ -5,27 +5,24 @@ import discord
 import time
 import datetime
 import asyncio
+from discord import app_commands
 from discord.ext import commands
 from dotenv import load_dotenv
-import pymongo
-from pymongo import MongoClient
-cluster = MongoClient("mongodb+srv://maskuh:Pusd4996@cluster0.qnihg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-db = cluster["discord"]
-collection = db["prefix"]
 #________________________________________________
 #File Configs
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+#TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv('Testing_bot')
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
-bot = commands.Bot(command_prefix='%', intents=intents, owner_id=786788350160797706, case_insensitive=True)
-bot.help_command = commands.MinimalHelpCommand()
+bot = commands.Bot(command_prefix='/', intents=intents, owner_id=os.getenv("Owner"), case_insensitive=True)
+bot.help_command = None
 #______________________________________________________________________________________________
 
 @bot.command()
 async def load(ctx, extension):
-  if ctx.author.id != 786788350160797706:
+  if ctx.author.id != os.getenv("Owner"):
     await ctx.channel.send(f"You can't load a cog only the bot owner can!")
   else:
     try:
@@ -38,7 +35,7 @@ async def load(ctx, extension):
 
 @bot.command()
 async def reload(ctx, extension):
-  if ctx.author.id != 786788350160797706:
+  if ctx.author.id != os.getenv("Owner"):
     await ctx.channel.send(f"You can't reload a cog only the bot owner can!")
   else:
     try:
@@ -49,7 +46,7 @@ async def reload(ctx, extension):
 
 @bot.command()
 async def unload(ctx, extension):
-  if ctx.author.id != 786788350160797706:
+  if ctx.author.id != os.getenv("Owner"):
     await ctx.channel.send(f"You can't unload a cog only the bot owner can!")
   else:
     await bot.unload_extension(f'cogs.{extension}')
@@ -59,12 +56,20 @@ async def unload(ctx, extension):
 @bot.event
 async def on_ready():
   await bot.load_extension("cogs.fun")
-  await bot.load_extension("cogs.events")
   await bot.load_extension("cogs.commands")
   await bot.load_extension("cogs.leave")
   await bot.load_extension("cogs.welcome")
   await bot.load_extension("cogs.join")
   await bot.load_extension("cogs.Kingdom")
   await bot.load_extension("cogs.moderation")
+  await bot.tree.sync()
+  await bot.change_presence(status= discord.Status.online, activity=discord.Game(f'%help Learning how to add more commands to my library of commands!'))
+  for guild in bot.guilds:
+    print(guild.name)
+    print(guild.me.guild_permissions)
+    print(f'{bot.user} is connected to the following guild:\n {guild.name}(id: {guild.id}) \n')
+    members = '\n - '.join([member.name for member in guild.members])
+    print(f'Guild Members:\n - {members}')
+  
 
 bot.run(TOKEN)

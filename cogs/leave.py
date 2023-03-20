@@ -5,40 +5,41 @@ import datetime
 import asyncio
 import pymongo
 from discord.ext import commands
-from discord import Webhook
+from discord import Webhook, app_commands
 from pymongo import MongoClient
 import aiohttp
-cluster = MongoClient("mongodb+srv://maskuh:Pusd4996@cluster0.qnihg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+cluster = MongoClient(os.getenv("Mongo"))
 db = cluster["discord"]
 collection = db["Leaver"]
-class leave(commands.Cog):
+class leave(commands.GroupCog):
     def __init__(self, client):
         self.client = client
     
-#welcome commands
+#leave commands
 
-    @commands.command(name='lenable')
-    async def lenable(self,ctx,channel : discord.TextChannel,*,arg):
-        result = collection.find_one({"_id": ctx.guild.id})
-        message = arg
+    @app_commands.command(description="Sets up a leave message")
+    @app_commands.describe(channel="The channel you want your leave message in")
+    @app_commands.describe(message="The message you want the bot to send on someone leavign")
+    async def enable(self,interaction: discord.Interaction,channel : discord.TextChannel,message: str):
+        result = collection.find_one({"_id": interaction.guild.id})
         if result :
-            collection.update_one({"_id": ctx.guild.id}, {"$set":{f"{ctx.guild.id}": [channel.id,message]}})
-            await ctx.channel.send("leave message updated!")
+            collection.update_one({"_id": interaction.guild.id}, {"$set":{f"{interaction.guild.id}": [channel.id,message]}})
+            await interaction.response.send_message("leave message updated!")
             return
         else:
-            collection.insert_one({"_id": ctx.guild.id, f"{ctx.guild.id}": [channel.id, message]})
-            await ctx.channel.send("leave message enabled!")
+            collection.insert_one({"_id": interaction.guild.id, f"{interaction.guild.id}": [channel.id, message]})
+            await interaction.response.send_message("leave message enabled!")
         
 
-    @commands.command(name='ldisable')
-    async def ldisable(self,ctx):
-        results = collection.find({"_id": ctx.guild.id})
+    @app_commands.command(description="Removes leave message from database")
+    async def disable(self,interaction: discord.Interaction):
+        results = collection.find({"_id": interaction.guild.id})
         for result in results:
-           if result["_id"] == ctx.guild.id:
-                collection.delete_one({"_id": ctx.guild.id})
-                await ctx.channel.send("I have removed the guild from the database!")
+           if result["_id"] == interaction.guild.id:
+                collection.delete_one({"_id": interaction.guild.id})
+                await interaction.response.send_message("I have removed the guild from the database!")
            else:
-                await ctx.channel.send("There is no leave message in the database!")
+                await interaction.response.send_message("There is no leave message in the database!")
 
 
 

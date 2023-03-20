@@ -4,44 +4,41 @@ import time
 import datetime
 import asyncio
 from discord.ext import commands, tasks
+from discord import app_commands
 
 
-class Basic_commands(commands.Cog):
+class commands(commands.GroupCog):
 
     def __init__(self, client):
         self.client = client
 
 # Ping command
-    @commands.command(name='Ping')
-    async def Ping(self, ctx):
-        await ctx.channel.send(f"**Pong!** That took {int(self.client.latency*1000)} ms!")
+    @app_commands.command(description="check the ping of the bot!")
+    async def ping(self, interaction: discord.Interaction):
+        await interaction.response.send_message(f"**Pong!** That took {int(self.client.latency*1000)} ms!")
 #Invite command
-    @commands.command(name='Invite')
-    async def Invite(self, ctx):
+    @app_commands.command(description="Sends Invite link to you to invite the bot")
+    async def invite(self, interaction: discord.Interaction):
         embed=discord.Embed(title='Invite Links!', description=f"[Invite(recommended)](https://discord.com/api/oauth2/authorize?client_id=902249858281394237&permissions=274877999168&scope=bot) \n [Invite(admin)](https://discord.com/api/oauth2/authorize?client_id=902249858281394237&permissions=8&scope=bot)", color=0x2ecc71)
-        await ctx.channel.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
-    @commands.command(name='Leave')
+    @app_commands.command(description="Makes the bot leave the guild")
     @commands.check_any(commands.is_owner(), commands.has_guild_permissions(manage_guild=True))
-    async def Leave(self,ctx):
-        await ctx.channel.send("Very well, idk why you would want me to leave but ok bye")
+    async def leave(self, interaction: discord.Interaction):
+        await interaction.response.send_message("Very well, idk why you would want me to leave but ok bye")
         await asyncio.sleep(1)
-        await ctx.guild.leave()     
-    #@Leave.error
-    async def pushback(self, ctx, error: commands.CommandError):
-        if isinstance(error, commands.MissingPermissions):
-          await ctx.send(f"{ctx.author.mention}You do not have permissions to do this command.")
+        await interaction.guild.leave()     
 
 
-    @commands.command(name='Support')
-    async def Support(self,ctx):
+
+    @app_commands.command(description="Sends link to the support server")
+    async def support(self,interaction: discord.Interaction):
         embed=discord.Embed(title='Support link', description="[Invite] (https://discord.gg/3setXsQJZu)", color=0x2ecc71)
-        await ctx.channel.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     
-    @commands.command()
-    async def stats(self, ctx):
-        channel = self.client.get_channel(957089374066077696)
+    @app_commands.command(description="Tells you stats of the bot")
+    async def stats(self, interaction: discord.Interaction):
         members = 0
         for guild in self.client.guilds:
             members += guild.member_count - 1
@@ -50,20 +47,21 @@ class Basic_commands(commands.Cog):
         embed.set_author(name="Made by Maskuh#3454")
         embed.add_field(name="Guilds", value=f"```{len(self.client.guilds)}```", inline=True) 
         embed.add_field(name="Users", value=f"```{members}```", inline=True)
-        await channel.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
     
-    @commands.command()
-    async def permissions(self, ctx, channel):
+    @app_commands.command(description="Checks a Channel for bot writing permissions")
+    @app_commands.describe(channel="The Channel to check permissions in")
+    async def permissions(self, interaction: discord.Interaction, channel: discord.TextChannel):
         em = discord.Embed(title=f'Testing', description=f"I am testing if i have permissions in this channel!")
-        channel = channel = await self.client.fetch_channel(channel)
+        channel  = await self.client.fetch_channel(channel.id)
         try:
             await channel.send(embed=em, delete_after=2)
-            await ctx.channel.send("I was able to send the embed and delete it after!")
+            await interaction.response.send_message("I was able to send the embed and delete it after!")
 
         except Exception as e:
-            await ctx.channel.send(f"{e}")
+            await interaction.response.send_message(f"{e}")
 
 
 
 async def setup(client):
-     await client.add_cog(Basic_commands(client)) 
+     await client.add_cog(commands(client)) 

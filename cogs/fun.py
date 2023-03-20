@@ -5,164 +5,170 @@ import datetime
 import asyncio
 import random
 import json
+from discord import app_commands
 from discord.ext import commands
-
-class fun(commands.Cog):
+class fun(commands.GroupCog):
 
     def __init__(self,client):
         self.client = client
 
-    @commands.command(name='beg')
-    @commands.cooldown(1,45,commands.BucketType.user)
-    async def beg(self, ctx):
-        await self.open_account(ctx.author)
+    @app_commands.command(description= "Beg people to give you coins")
+    @app_commands.checks.cooldown(1,45)
+    async def beg(self, interaction: discord.Interaction):
+        await self.open_account(interaction.user)
         users = await self.get_bank_data()
-        user = ctx.author
+        user = interaction.user
         earnings = random.randrange(451)
         em1 = (f"The developer gave you {earnings} coins!! You must be lucky")
         em2 = (f"A person that walked up to your front door gave you a package with {earnings} coins in it. Wow what a treat!!")
         em3 = (f'You have bad luck you got nothing.')
         begthem = [em1, em2, em3]
-        await ctx.channel.send(random.choice(begthem))
+        await interaction.response.send_messsage(random.choice(begthem))
         users = await self.get_bank_data()
         users[str(user.id)]["wallet"] += earnings
         with open("mainbank.json","w") as f:
             json.dump(users, f)
 
-    @commands.command(name='Work')
-    @commands.cooldown(1,21600,commands.BucketType.user)
-    async def Work(self,ctx):
-        await self.open_account(ctx.author)
+    @app_commands.command(description="Alows you to work for coins")
+    @app_commands.checks.cooldown(1,21600)
+    async def work(self, interaction: discord.Interaction):
+        await self.open_account(interaction.user)
         users = await self.get_bank_data()
-        user = ctx.author
+        user = interaction.user
         earnings = random.randint(100,5000)
         em = discord.Embed(title = "McDonald's Worker", description=f"You worked as a McDonald's worker and you got {earnings} for your day of work!!")
-        await ctx.channel.send(embed = em)
+        await interaction.response.send_message(embed = em)
         users[str(user.id)]["wallet"] += earnings
         with open("mainbank.json","w") as f:
             json.dump(users, f)
-    @commands.command(name='daily')
-    @commands.cooldown(1,86400, commands.BucketType.user)
-    async def daily(self, ctx):
-        await self.open_account(ctx.author)
+    @app_commands.command(name='daily')
+    @app_commands.checks.cooldown(1,86400)
+    async def daily(self, interaction: discord.Interaction):
+        await self.open_account(interaction.user)
         users = await self.get_bank_data()
-        user = ctx.author
+        user = interaction.user
         earnings = 15000
-        em = discord.Embed(title = f"{ctx.author.name}'s daily ammount", description=f"You got **{earnings}** coins from your daily salery for being in the server!")
-        await ctx.channel.send(embed = em)
+        em = discord.Embed(title = f"{interaction.user.name}'s daily ammount", description=f"You got **{earnings}** coins from your daily salery for being in the server!")
+        await interaction.response.send_message(embed = em)
         users[str(user.id)]["wallet"] += earnings
         with open("mainbank.json","w") as f:
             json.dump(users, f)
         
 
-    #@commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    @commands.Cog.listener()
+    async def on_command_error(self, interaction: discord.Interaction, error):
         if isinstance(error, commands.CommandOnCooldown):
             msg = "**Still on cooldown!!!**, please try again in {:.2f}s".format(error.retry_after)
-            await ctx.send(msg, delete_after = 10)
+            await interaction.response.send_message(msg, delete_after = 10)
             await asyncio.sleep(10)
-            await ctx.message.delete()
+            await interaction.message.delete()
 
-    @commands.command(name='Number')
-    async def Number(self, ctx):
+    @app_commands.command(description= "Gives you a random number between 50 and 150")
+    async def number(self, interaction: discord.Interaction):
         Number = random.randint(50, 150)
-        await ctx.channel.send(Number)
-    @commands.command()
-    async def bal(self, ctx):
-        await self.open_account(ctx.author)
-        user = ctx.author
+        await interaction.response.send_message(Number)
+    @app_commands.command()
+    async def bal(self, interaction: discord.Interaction):
+        await self.open_account(interaction.user)
+        user = interaction.user
         users = await self.get_bank_data()
 
         wallet_amt = users[str(user.id)]["wallet"]
         bank_amt = users[str(user.id)]["bank"]
         
-        em = discord.Embed(title = f"{ctx.author.name}'s balance", color = discord.Color.green())
+        em = discord.Embed(title = f"{interaction.user.name}'s balance", color = discord.Color.green())
         em.add_field(name = "Wallet", value =wallet_amt)
         em.add_field(name = "Bank", value =bank_amt)
-        await ctx.send(embed = em)
+        await interaction.response.send_message(embed = em)
 
-    @commands.command()
-    async def withdraw(self, ctx, amount = None, aliases = ["with"]):
-        await self.open_account(ctx.author)
+    @app_commands.command()
+    @app_commands.describe(amount="The amount to withdraw")
+    async def withdraw(self, interaction: discord.Interaction, amount: int):
+        await self.open_account(interaction.user)
         if amount == None:
-            await ctx.send("please enter the amount to withdraw!")
-        bal = await self.update_bank(ctx.author)
+            await interaction.response.send_message("please enter the amount to withdraw!")
+        bal = await self.update_bank(interaction.user)
         amount = int(amount)
         if amount>bal[1]:
-            await ctx.send("Your not that rich!")
+            await interaction.response.send_message("Your not that rich!")
             return
         if amount<0:
-            await ctx.send("Amount must be greater than zero!")
+            await interaction.response.send_message("Amount must be greater than zero!")
             return
-        await self.update_bank(ctx.author,amount)
-        await self.update_bank(ctx.author,-1*amount, "bank")
-        await ctx.send(f"You withdrew {amount} coins")
+        await self.update_bank(interaction.user,amount)
+        await self.update_bank(interaction.user,-1*amount, "bank")
+        await interaction.response.send_message(f"You withdrew {amount} coins")
 
 
-    @commands.command(aliases = ["dep"])
-    async def desposit(self, ctx, amount = None):
-        await self.open_account(ctx.author)
+    @app_commands.command()
+    @app_commands.describe(amount="The amount you want to desposit")
+    async def desposit(self, interaction: discord.Interaction, amount: int):
+        await self.open_account(interaction.user)
         if amount == None:
-            await ctx.send("please enter the amount to desposit!")
-        bal = await self.update_bank(ctx.author)
+            await interaction.response.send_message("please enter the amount to desposit!")
+        bal = await self.update_bank(interaction.user)
         amount = int(amount)
         if amount>bal[0]:
-            await ctx.send("Your not that rich!")
+            await interaction.response.send_message("Your not that rich!")
             return
         if amount<0:
-            await ctx.send("Amount must be greater than zero!")
+            await interaction.response.send_message("Amount must be greater than zero!")
             return
-        await self.update_bank(ctx.author,-1*amount)
-        await self.update_bank(ctx.author,amount, "bank")
-        await ctx.send(f"You deposited {amount} coins")
+        await self.update_bank(interaction.user,-1*amount)
+        await self.update_bank(interaction.user,amount, "bank")
+        await interaction.response.send_message(f"You deposited {amount} coins")
 
-    @commands.command()
-    async def empty(self, ctx, amount = None):
-        await self.open_account(ctx.author)
+    @app_commands.command()
+    @app_commands.describe(amount="The amount you want to withdraw")
+    async def empty(self, interaction: discord.Interaction, amount: int):
+        await self.open_account(interaction.user)
         if amount == None:
-            await ctx.send("please enter the amount to withdraw!")
-        bal = await self.update_bank(ctx.author)
+            await interaction.response.send_message("please enter the amount to withdraw!")
+        bal = await self.update_bank(interaction.user)
         amount = int(amount)
         if amount>bal[1]:
-            await ctx.send("Your not that rich!")
+            await interaction.response.send_message("Your not that rich!")
             return
         if amount<0:
-            await ctx.send("Amount must be greater than zero!")
+            await interaction.response.send_message("Amount must be greater than zero!")
             return
-        await self.update_bank(ctx.author,amount)
-        await self.update_bank(ctx.author,-1*amount, "bank")
-        await ctx.send(f"You emptied {amount} coins from your bank account! I wonder why you did it.")
+        await self.update_bank(interaction.user,amount)
+        await self.update_bank(interaction.user,-1*amount, "bank")
+        await interaction.response.send_message(f"You emptied {amount} coins from your bank account! I wonder why you did it.")
 
-    @commands.command()
-    async def give(self, ctx,member:discord.Member, amount = None):
-        await self.open_account(ctx.author)
+    @app_commands.command(description= "Give money to a user")
+    @app_commands.describe(member= "The member you want to give money to")
+    @app_commands.describe(amount= "The amount you want to give")
+    async def give(self, interaction: discord.Interaction,member:discord.Member, amount: int):
+        await self.open_account(interaction.user)
         await self.open_account(member)
         if amount == None:
-            await ctx.send("please enter the amount to give!")
-        bal = await self.update_bank(ctx.author)
+            await interaction.response.send_message("please enter the amount to give!")
+        bal = await self.update_bank(interaction.user)
         amount = int(amount)
         if amount>bal[0]:
-            await ctx.send("Your not that rich!")
+            await interaction.response.send_message("Your not that rich!")
             return
         if amount<0:
-            await ctx.send("Amount must be greater than zero!")
+            await interaction.response.send_message("Amount must be greater than zero!")
             return
-        await self.update_bank(ctx.author, -1*amount)
+        await self.update_bank(interaction.user, -1*amount)
         await self.update_bank(member,amount)
-        await ctx.send(f"You gave {amount} coins to {member}!!")
+        await interaction.response.send_message(f"You gave {amount} coins to {member}!!")
 
-    @commands.command()
-    async def slots(self, ctx, amount):
-        await self.open_account(ctx.author)
+    @app_commands.command(description="gamble your money!")
+    @app_commands.describe(amount="The amount you want to Gamble")
+    async def slots(self, interaction: discord.Interaction, amount: int):
+        await self.open_account(interaction.user)
         if amount == None:
-            await ctx.send("please enter the amount!")
-        bal = await self.update_bank(ctx.author)
+            await interaction.response.send_message("please enter the amount!")
+        bal = await self.update_bank(interaction.user)
         amount = int(amount)
         if amount>bal[0]:
-            await ctx.send("Your not that rich!")
+            await interaction.reponse.send_message("Your not that rich!")
             return
         if amount<0:
-            await ctx.send("Amount must be greater than zero!")
+            await interaction.response.send_message("Amount must be greater than zero!")
             return
         final = []
         for i in range(3):
@@ -171,18 +177,17 @@ class fun(commands.Cog):
             final.append(a)
 
 
-        await ctx.send(str(final))
 
         if final[0] == final[1] or final[0] == final[2] or final[2] == final[1]:
-            await self.update_bank(ctx.author,1*amount)
-            await ctx.send("You won!")
+            await self.update_bank(interaction.user,1*amount)
+            await interaction.response.send_message(f"{str(final)} \n You won!")
         else: 
-            await self.update_bank(ctx.author,-1*amount)
-            await ctx.send("You lost.")
+            await self.update_bank(interaction.user,-1*amount)
+            await interaction.response.send_message(f"{str(final)} \nYou lost.")
 
         
-    @commands.command()
-    async def shop(self, ctx):
+    @app_commands.command(description="Shows the items in the shop")
+    async def shop(self, interaction: discord.Interaction):
     
         em = discord.Embed(title = "Shop")
 
@@ -192,27 +197,29 @@ class fun(commands.Cog):
             desc = item["description"]
             em.add_field(name = name, value = f"${price} | {desc}")
 
-        await ctx.send(embed= em)
+        await interaction.response.send_message(embed= em)
 
-    @commands.command()
-    async def buy(self, ctx,item,amount = 1):
-        await self.open_account(ctx.author)
-        user = ctx.author
-        res = await self.buy_this(ctx, user, item, amount)
+    @app_commands.command()
+    @app_commands.describe(item="The item you want to buy")
+    @app_commands.describe(amount="The amount you want to buy")
+    async def buy(self, interaction: discord.Interaction,item: str,amount: int = 1):
+        await self.open_account(interaction.user)
+        user = interaction.user
+        res = await self.buy_this(interaction, user, item, amount)
 
         if not res[0]:
             if res[1]==1:
-                await ctx.send("That item isn't there!")
+                await interaction.response.send_message("That item isn't there!")
                 return
             if res[1] ==2:
-                await ctx.send(f"You don't have enough coins in your wallet to buy {amount}") 
+                await interaction.response.send_message(f"You don't have enough coins in your wallet to buy {amount}") 
                 return
-        await ctx.send(f"You just bought {amount} {item}")
+        await interaction.response.send_message(f"You just bought {amount} {item}")
 
-    @commands.command()
-    async def bag(self, ctx):
-        await self.open_account(ctx.author)
-        user = ctx.author
+    @app_commands.command(description="Shows the contents of your bag")
+    async def bag(self, interaction: discord.Interaction):
+        await self.open_account(interaction.user)
+        user = interaction.user
         users = await self.get_bank_data()
         try:
             bag = users[str(user.id)]["bag"]
@@ -224,9 +231,11 @@ class fun(commands.Cog):
             name = item["item"]
             amount = item["amount"]
             em.add_field(name = name, value = amount)
-        await ctx.send(embed = em)
-    @commands.command()
-    async def sell(self,ctx,item,amount = 1):
+        await interaction.response.send_message(embed = em)
+    @app_commands.command(description="Sells an item back to the shop")
+    @app_commands.describe(item="The item you want to sell")
+    @app_commands.describe(amount="The amount of the items you want to sell")
+    async def sell(self,interaction: discord.Interaction,item: str,amount: int = 1):
         await self.open_account(ctx.author)
 
         res = await self.sell_this(ctx.author,item,amount)
@@ -244,8 +253,9 @@ class fun(commands.Cog):
 
             await ctx.send(f"You just sold {amount} {item}.")
 
-    @commands.command(aliases = ["lb"])
-    async def leaderboard(self,ctx,x = 10):
+    @app_commands.command(description="Shows who is the richest")
+    async def leaderboard(self,interaction: discord.Interaction,):
+        x = 10
         users = await self.get_bank_data()
         leader_board = {}
         total = []
@@ -269,7 +279,7 @@ class fun(commands.Cog):
         else:
             index += 1
 
-        await ctx.send(embed = em)
+        await interaction.response.send_message(embed = em)
                
 
 
@@ -316,7 +326,7 @@ class fun(commands.Cog):
     {"name":"beer","price":3000,"description": "Makes your cooldown time less but you suffer more if you drink to much"},
     {"name":"Silicon","price":50000,"description": "daily reward increases by 15,000 (Daily reward not yet implemented so just save them)"}]
 
-    async def buy_this(self,ctx,user,item_name,amount):
+    async def buy_this(self,interaction: discord.Interaction,user,item_name,amount):
         item_name = item_name.lower()
         name_ = None
         for item in self.mainshop:
