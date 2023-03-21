@@ -17,19 +17,18 @@ class Moderation(commands.GroupCog):
     @app_commands.checks.has_permissions(manage_messages=True)
     async def purge(self, interaction: discord.Interaction, limit: int):
             if not limit:
-                purge_failed = discord.Embed(title='Purge [%Purge]', description=f'Failed to Purge {limit} messages. \n Command executed by {ctx.author}.', color=discord.Colour.random())
+                purge_failed = discord.Embed(title='Purge [%Purge]', description=f'Failed to Purge {limit} messages. \n Command executed by {interaction.user}.', color=discord.Colour.random())
                 purge_failed.set_footer(text=str(datetime.datetime.now()))
                 return await interaction.response.send_message(embed=purge_failed)
-            await interaction.message.delete()
             await asyncio.sleep(1)
-            await ctx.channel.purge(limit=limit)
-            purge_embed = discord.Embed(title='Purge [%Purge]', description=f'Successfully Purged {limit} messages. \n Command executed by {ctx.author}.', color=discord.Colour.random())
+            await interaction.channel.purge(limit=limit)
+            purge_embed = discord.Embed(title='Purge [%Purge]', description=f'Successfully Purged {limit} messages. \n Command executed by {interaction.user}.', color=discord.Colour.random())
             purge_embed.set_footer(text=str(datetime.datetime.now()))
-            await ctx.send(embed=purge_embed)
-    @purge.error
-    async def sendback(self, interaction: discord.Interaction, error: commands.CommandError):
-        if isinstance(error, commands.MissingPermissions):  
-          await interaction.response.send_message(f"{ctx.author.mention}You do not have permissions to do this command.")
+            await interaction.response.send_message(embed=purge_embed)
+    #@purge.error
+    #async def sendback(self, interaction: discord.Interaction, error: commands.CommandError):
+     #   if isinstance(error, commands.MissingPermissions):  
+      #    await interaction.response.send_message(f"{interaction.user.mention}You do not have permissions to do this command.")
 
 
     
