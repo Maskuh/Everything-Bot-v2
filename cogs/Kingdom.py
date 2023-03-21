@@ -57,7 +57,7 @@ class Kingdom(commands.Cog):
         guild = self.client.get_guild(int(os.getenv("Kingdom_3")))
         hannel = self.client.get_channel(int(os.getenv("Kingdom_12")))
         annel = self.client.get_channel(int(os.getenv("Kingdom_13")))
-        channel = self.client.get_channel(int(os.getenv("kingdom_14")))
+        channel = self.client.get_channel(int(os.getenv("Kingdom_14")))
         bot_user = len(list(filter(lambda x: x.bot, guild.members)))
         user = len(list(filter(lambda x: not x.bot, guild.members)))
         await channel.edit(name=f"{len(guild.members)} Total Members")
