@@ -11,8 +11,8 @@ class Kingdom(commands.Cog):
     def __init__(self, client):
         self.client = client
         load_dotenv()
-        self.reaction_roles = os.getenv("Kingdom_rr")
-        self.channel = self.client.get_channel(os.getenv("Kingdom_rr2"))
+        self.reaction_roles = int(os.getenv("Kingdom_rr"))
+        self.channel = self.client.get_channel(int(os.getenv("Kingdom_rr2")))
     async def cog_load(self):
         self.vc.cancel()
         self.vc.start()
@@ -21,31 +21,31 @@ class Kingdom(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member : discord.member):
-        if member.guild.id == os.getenv("Kingdom_3"):
-            channel = self.client.get_channel(os.getenv("Kingdom4"))
-            em = discord.Embed(title=f'Welcome {member}', description=f"Hey, {member.mention} Welcome to {member.guild}! \n \n Please read the rules in <#{os.getenv('Kingdom_5')}> \n \n  get roles at <#{os.getenv('Kingdom_6')}> Enjoys your vist!", color = discord.Color.from_rgb(4, 3, 97), timestamp=datetime.datetime.now())
+        if member.guild.id == int(os.getenv("Kingdom_3")):
+            channel = self.client.get_channel(int(os.getenv("Kingdom4")))
+            em = discord.Embed(title=f'Welcome {member}', description=f"Hey, {member.mention} Welcome to {member.guild}! \n \n Please read the rules in <#{int(os.getenv('Kingdom_5'))}> \n \n  get roles at <#{int(os.getenv('Kingdom_6'))}> Enjoys your vist!", color = discord.Color.from_rgb(4, 3, 97), timestamp=datetime.datetime.now())
             em.set_thumbnail(url=member.avatar)
             await channel.send(embed=em)
             await channel.send(f"{member.mention}",  delete_after=1)
             try:
                 if member.bot:
-                    ro = member.guild.get_role(os.getenv("Kingdom_7"))
+                    ro = member.guild.get_role(int(os.getenv("Kingdom_7")))
                     await member.add_roles(ro)
                     return
-                guild = self.client.get_guild(os.getenv("Kingdom_3"))
+                guild = self.client.get_guild(int(os.getenv("Kingdom_3")))
                 if len(list(filter(lambda x: not x.bot, guild.members))) <= 500:
-                    role = member.guild.get_role(os.getenv("Kingdom_8"))
+                    role = member.guild.get_role(int(os.getenv("Kingdom_8")))
                     await member.add_roles(role)
-                rol = member.guild.get_role(os.getenv("Kingdom_9"))
+                rol = member.guild.get_role(int(os.getenv("Kingdom_9")))
                 await member.add_roles(rol)
             except Exception as e: 
-                channe = self.client.get_channel(os.getenv("Kingdom_10"))
+                channe = self.client.get_channel(int(os.getenv("Kingdom_10")))
                 await channe.send(e)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member : discord.member):
-        if member.guild.id == os.getenv("Kingdom_3"):
-            channel = self.client.get_channel(os.getenv("Kingdom_11"))
+        if member.guild.id == int(os.getenv("Kingdom_3")):
+            channel = self.client.get_channel(int(os.getenv("Kingdom_11")))
             em = discord.Embed(title=f'Goodbye {member}', description=f"{member.mention} left {member.guild}", color = discord.Color.from_rgb(0, 0, 0), timestamp=datetime.datetime.now())
             em.set_thumbnail(url=member.avatar)
             await channel.send(embed=em)
@@ -54,10 +54,10 @@ class Kingdom(commands.Cog):
     @tasks.loop(minutes=5)
     async def vc(self):
         await self.client.wait_until_ready()
-        guild = self.client.get_guild(os.getenv("Kingdom_3"))
-        hannel = self.client.get_channel(os.getenv("Kingdom_12"))
-        annel = self.client.get_channel(os.getenv("Kingdom_13"))
-        channel = self.client.get_channel(os.getenv("kingdom_14"))
+        guild = self.client.get_guild(int(os.getenv("Kingdom_3")))
+        hannel = self.client.get_channel(int(os.getenv("Kingdom_12")))
+        annel = self.client.get_channel(int(os.getenv("Kingdom_13")))
+        channel = self.client.get_channel(int(os.getenv("kingdom_14")))
         bot_user = len(list(filter(lambda x: x.bot, guild.members)))
         user = len(list(filter(lambda x: not x.bot, guild.members)))
         await channel.edit(name=f"{len(guild.members)} Total Members")

@@ -22,7 +22,7 @@ bot.help_command = None
 
 @bot.command()
 async def load(ctx, extension):
-  if ctx.author.id != os.getenv("Owner"):
+  if ctx.author.id != int(os.getenv("Owner")):
     await ctx.channel.send(f"You can't load a cog only the bot owner can!")
   else:
     try:
@@ -35,7 +35,7 @@ async def load(ctx, extension):
 
 @bot.command()
 async def reload(ctx, extension):
-  if ctx.author.id != os.getenv("Owner"):
+  if ctx.author.id != int(os.getenv("Owner")):
     await ctx.channel.send(f"You can't reload a cog only the bot owner can!")
   else:
     try:
@@ -46,7 +46,7 @@ async def reload(ctx, extension):
 
 @bot.command()
 async def unload(ctx, extension):
-  if ctx.author.id != os.getenv("Owner"):
+  if ctx.author.id != int(os.getenv("Owner")):
     await ctx.channel.send(f"You can't unload a cog only the bot owner can!")
   else:
     await bot.unload_extension(f'cogs.{extension}')
