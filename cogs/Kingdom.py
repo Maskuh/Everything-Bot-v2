@@ -22,7 +22,7 @@ class Kingdom(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member : discord.member):
         if member.guild.id == int(os.getenv("Kingdom_3")):
-            channel = self.client.get_channel(int(os.getenv("Kingdom4")))
+            channel = self.client.get_channel(int(os.getenv("Kingdom_4")))
             em = discord.Embed(title=f'Welcome {member}', description=f"Hey, {member.mention} Welcome to {member.guild}! \n \n Please read the rules in <#{int(os.getenv('Kingdom_5'))}> \n \n  get roles at <#{int(os.getenv('Kingdom_6'))}> Enjoys your vist!", color = discord.Color.from_rgb(4, 3, 97), timestamp=datetime.datetime.now())
             em.set_thumbnail(url=member.avatar)
             await channel.send(embed=em)
