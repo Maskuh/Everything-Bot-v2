@@ -63,6 +63,39 @@ class commands(commands.GroupCog):
         except Exception as e:
             await interaction.response.send_message(f"{e}")
 
+    @app_commands.command(description="Sets you back to keyboard")
+    @app_commands.describe(user="the user you want to set back to keyboard")
+    async def btk(self, interaction: discord.Interaction, user: discord.User = None):
+        if user == None:
+            user = interaction.user
+        name = user.display_name
+        try:
+            if name.startswith('[AFK]'):
+                name2=name.lstrip("[AFK]")
+                print(name2)
+                await user.edit(nick=f"{name2}")
+                await interaction.response.send_message(f"{interaction.user.mention} I have set {user.mention} btk!")
+            else: await interaction.response.send_message(f"{interaction.user.mention} I can't unafk {user.mention} if your not afk to start!")
+        except:
+            await interaction.response.send_message(f"{interaction.user.mention} I can't set {user.mention} btk as i don't have the permission to.")
+    
+    @app_commands.command(description="Sets you afk")
+    @app_commands.describe(user="the user you want to set afk")
+    async def afk(self, interaction: discord.Interaction, user: discord.User = None):
+        if user == None:
+            user = interaction.user
+        name = user.display_name
+        try:
+            if name.startswith('[AFK]'): 
+                await interaction.response.send_message(f"{interaction.user.mention} this user is already afk")
+                return
+            else:
+                await user.edit(nick=f"[AFK] {name}")
+                await interaction.response.send_message(f"{interaction.user.mention} I have set {user.mention} afk!")
+        except:
+            await interaction.response.send_message(f"{interaction.user.mention} I can't set {user.mention} afk as i don't have the permission to.")
+    
+
 
 
 async def setup(client):

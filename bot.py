@@ -28,6 +28,7 @@ async def load(ctx, extension):
     try:
       await bot.load_extension(f'cogs.{extension}')
       await ctx.channel.send("Cog loaded!")
+      print(f"{extension} Cog was loaded")
     except Exception as e:
             await ctx.channel.send(f"{e}")
 
@@ -41,6 +42,7 @@ async def reload(ctx, extension):
     try:
       await bot.reload_extension(f'cogs.{extension}')
       await ctx.channel.send("Cog reloaded!")
+      print(f"{extension} was reloaded")
     except Exception as e:
             await ctx.channel.send(f"{e}")
 
@@ -51,6 +53,7 @@ async def unload(ctx, extension):
   else:
     await bot.unload_extension(f'cogs.{extension}')
     await ctx.channel.send("Cog unloaded!")
+    print(f"{extension} was unloaded")
 
 
 @bot.event
