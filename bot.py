@@ -11,8 +11,8 @@ from dotenv import load_dotenv
 #________________________________________________
 #File Configs
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
-#TOKEN = os.getenv('Testing_bot')
+#TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv('Testing_bot')
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
@@ -65,6 +65,7 @@ async def on_ready():
   await bot.load_extension("cogs.join")
   await bot.load_extension("cogs.Kingdom")
   await bot.load_extension("cogs.moderation")
+  await bot.load_extension("cogs.HRS")
   await bot.tree.sync()
   await bot.change_presence(status= discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name='How to add more commands to my library of commands!'))
   for guild in bot.guilds:

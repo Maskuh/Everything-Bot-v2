@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from discord import Webhook, app_commands
 from pymongo import MongoClient
 import aiohttp
-import motor.motor_asyncio
+#import motor.motor_asyncio
 cluster = MongoClient(os.getenv("Mongo"))
 db = cluster["discord"]
 collection = db["welcomer"]
