@@ -67,8 +67,9 @@ class Kingdom(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        print("role was triggered")
         guild = self.client.get_guild(payload.guild_id)
+        if guild.id != 1078694231465541632: return
+        print("role was triggered")
         print(f"{payload.emoji.name}")
         if payload.emoji.name == "Giveaways" and payload.message_id == self.reaction_roles:
             print("got here")
